@@ -7,9 +7,7 @@ import swt6.timer.interfaces.Timer;
 import swt6.timer.interfaces.TimerService;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class Client {
     private static boolean isRunning = true;

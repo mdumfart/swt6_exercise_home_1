@@ -1,7 +1,6 @@
 package swt6.timer.util;
 
 import java.time.Duration;
-import java.time.format.DateTimeFormatter;
 import java.util.EventObject;
 
 public class TimerEvent extends EventObject {
