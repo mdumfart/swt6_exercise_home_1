@@ -1,4 +1,6 @@
-package swt6;
+package swt6.timer.interfaces;
+
+import swt6.timer.util.TimerEvent;
 
 import java.util.EventListener;
 
