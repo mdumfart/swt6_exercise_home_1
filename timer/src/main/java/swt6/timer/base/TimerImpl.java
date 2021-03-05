@@ -84,19 +84,28 @@ public class TimerImpl implements Timer {
 
     public void run() {
         Thread thread = new Thread(() -> {
+            boolean manualStop = false;
+
             logger.info(String.format("+++ Timer [%s] started +++", id));
 
             while(isActive && elapsedIterations != iterations) {
                 try {
                     Thread.sleep(interval);
-                    fireTickEvent();
+
+                    if (isActive){
+                        fireTickEvent();
+                    }
+                    else {
+                        logger.info(String.format("Timer [%s] stopped manually", id));
+                        manualStop = true;
+                    }
                 } catch (InterruptedException e) {
                     isActive = false;
                     logger.error("Timer unexpectedly interrupted: Timer stopped");
                 }
             }
 
-            fireElapsedEvent();
+            if (!manualStop) fireElapsedEvent();
         });
         thread.start();
     }
