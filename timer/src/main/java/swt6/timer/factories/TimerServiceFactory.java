@@ -1,6 +1,6 @@
 package swt6.timer.factories;
 
-import swt6.timer.base.TimerServiceImpl;
+import swt6.timer.services.TimerServiceImpl;
 import swt6.timer.interfaces.TimerService;
 
 public class TimerServiceFactory {

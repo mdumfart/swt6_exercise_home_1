@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class TimerImpl implements Timer {
-    private static Logger logger = LogManager.getLogger();
+    private static Logger logger = LogManager.getLogger(TimerImpl.class);
     private List<TimerListener> timerListeners = new CopyOnWriteArrayList<>();
 
     private final int id;
