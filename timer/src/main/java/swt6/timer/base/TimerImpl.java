@@ -61,6 +61,12 @@ public class TimerImpl implements Timer {
     }
 
     @Override
+    public void reset() {
+        elapsedIterations = 0;
+        logger.info(String.format("Timer [%s] reset", id));
+    }
+
+    @Override
     public boolean isActive() {
         return isActive;
     }
@@ -106,6 +112,8 @@ public class TimerImpl implements Timer {
             }
 
             if (!manualStop) fireElapsedEvent();
+            elapsedIterations = 0;
+            isActive = false;
         });
         thread.start();
     }

@@ -8,6 +8,7 @@ import swt6.timer.interfaces.TimerService;
 
 import java.util.List;
 import java.util.Scanner;
+import java.util.ServiceLoader;
 
 public class Client {
     private static boolean isRunning = true;
@@ -19,8 +20,7 @@ public class Client {
 
     public static void main(String[] args) {
 
-        System.out.println("Available commands:");
-        System.out.println("/create, /start, /stop, /list, /quit");
+        printCommands();
 
         while(isRunning) {
             computeInput(scanner.nextLine());
@@ -38,12 +38,17 @@ public class Client {
             case "/stop":
                 computeStop();
                 break;
+            case "/reset":
+                computeReset();
+                break;
             case "/list":
                 computeList();
                 break;
             case "/quit":
                 computeQuit();
                 break;
+            default:
+                computeUnknownCommand(cmd);
         }
     }
 
@@ -143,6 +148,20 @@ public class Client {
         }
     }
 
+    private static void computeReset() {
+        computeList();
+
+        Timer t = getTimerFromInput();
+
+        try {
+            if (t != null) {
+                t.reset();
+            }
+        } catch (Exception e) {
+            logger.error(e);
+        }
+    }
+
     private static void computeList() {
         List<Timer> timers = timerService.getAllTimers();
 
@@ -200,4 +219,24 @@ public class Client {
         } while (!validId);
         return t;
     }
+
+    private static void printCommands() {
+        System.out.println("Available commands:");
+        System.out.println("/create, /start, /stop, /reset, /list, /quit");
+    }
+
+    private static void computeUnknownCommand(String cmd) {
+        System.out.printf("Unknown command: %s%n", cmd);
+        printCommands();
+    }
+
+    private static TimerService getTimerService () {
+        ServiceLoader<TimerServiceFactory> loader = ServiceLoader.load(TimerServiceFactory.class);
+
+        for (TimerServiceFactory tsf : loader) {
+            if (tsf.getClass() != null)
+                return tsf.pro();
+        }
+    }
+
 }
