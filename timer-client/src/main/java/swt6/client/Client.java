@@ -2,9 +2,10 @@ package swt6.client;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import swt6.timer.factories.TimerServiceFactory;
+import swt6.timer.factories.TimerServiceFactoryImpl;
 import swt6.timer.interfaces.Timer;
 import swt6.timer.interfaces.TimerService;
+import swt6.timer.interfaces.TimerServiceFactory;
 
 import java.util.List;
 import java.util.Scanner;
@@ -12,7 +13,7 @@ import java.util.ServiceLoader;
 
 public class Client {
     private static boolean isRunning = true;
-    private static TimerService timerService = TimerServiceFactory.getTimerService();
+    private static TimerService timerService = getTimerService();
 
     private static Scanner scanner = new Scanner(System.in);
     private final static Logger logger = LogManager.getLogger(Client.class);
@@ -183,7 +184,8 @@ public class Client {
         List<Timer> timers = timerService.getAllTimers();
 
         for (Timer t : timers) {
-            t.stop();
+            if (t.isActive())
+                t.stop();
         }
 
         isRunning = false;
@@ -231,12 +233,14 @@ public class Client {
     }
 
     private static TimerService getTimerService () {
+        TimerService t = null;
+
         ServiceLoader<TimerServiceFactory> loader = ServiceLoader.load(TimerServiceFactory.class);
 
-        for (TimerServiceFactory tsf : loader) {
-            if (tsf.getClass() != null)
-                return tsf.pro();
-        }
-    }
+        for (TimerServiceFactory tsf : loader)
+            if (tsf.providesFeature("TimerServiceImpl"))
+                t = tsf.getTimerService();
 
+        return t;
+    }
 }
