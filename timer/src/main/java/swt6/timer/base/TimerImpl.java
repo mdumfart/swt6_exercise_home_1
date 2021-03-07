@@ -67,6 +67,16 @@ public class TimerImpl implements Timer {
     }
 
     @Override
+    public void changeInterval(int interval) {
+        this.interval = interval;
+    }
+
+    @Override
+    public void changeIterations(int iterations) {
+        this.iterations = iterations;
+    }
+
+    @Override
     public boolean isActive() {
         return isActive;
     }
@@ -98,7 +108,7 @@ public class TimerImpl implements Timer {
                 try {
                     Thread.sleep(interval);
 
-                    if (isActive){
+                    if (isActive && elapsedIterations < iterations){
                         fireTickEvent();
                     }
                     else {

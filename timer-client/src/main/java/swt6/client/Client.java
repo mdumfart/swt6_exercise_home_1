@@ -39,6 +39,8 @@ public class Client {
             case "/stop":
                 computeStop();
                 break;
+            case "/change":
+                computeChange();
             case "/reset":
                 computeReset();
                 break;
@@ -149,6 +151,10 @@ public class Client {
         }
     }
 
+    private static void computeChange() {
+
+    }
+
     private static void computeReset() {
         computeList();
 
@@ -224,7 +230,7 @@ public class Client {
 
     private static void printCommands() {
         System.out.println("Available commands:");
-        System.out.println("/create, /start, /stop, /reset, /list, /quit");
+        System.out.println("/create, /start, /stop, /change, /reset, /list, /quit");
     }
 
     private static void computeUnknownCommand(String cmd) {
