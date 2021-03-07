@@ -2,7 +2,6 @@ package swt6.client;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import swt6.timer.factories.TimerServiceFactoryImpl;
 import swt6.timer.interfaces.Timer;
 import swt6.timer.interfaces.TimerService;
 import swt6.timer.interfaces.TimerServiceFactory;
@@ -41,6 +40,7 @@ public class Client {
                 break;
             case "/change":
                 computeChange();
+                break;
             case "/reset":
                 computeReset();
                 break;
@@ -152,7 +152,64 @@ public class Client {
     }
 
     private static void computeChange() {
+        computeList();
 
+        Timer t = getTimerFromInput();
+
+        String changeCmd;
+        do {
+            System.out.println("Do you want to change maximum iterations (iter) or interval (inter)? >");
+
+            changeCmd = scanner.nextLine();
+        } while (!changeCmd.equals("iter") && !changeCmd.equals("inter"));
+
+        if (changeCmd.equals("iter"))
+            computeChangeIterations(t);
+        else
+            computeChangeInterval(t);
+
+    }
+
+    private static void computeChangeIterations(Timer t) {
+        boolean successfulChange = false;
+
+        do {
+            System.out.println(t.getInfo());
+            System.out.println("Enter new iteration amount  >");
+
+            try {
+                int iterations = Integer.parseInt(scanner.nextLine());
+                timerService.changeTimerIterations(t, iterations);
+
+                successfulChange = true;
+                logger.info("Timer updated:");
+                logger.info(t.getInfo());
+            } catch (Exception e) {
+                logger.error(e);
+            }
+
+        } while (!successfulChange);
+    }
+
+    private static void computeChangeInterval(Timer t) {
+        boolean successfulChange = false;
+
+        do {
+            System.out.println(t.getInfo());
+            System.out.println("Enter new interval in ms (>50ms)  >");
+
+            try {
+                int interval = Integer.parseInt(scanner.nextLine());
+                timerService.changeTimerInterval(t, interval);
+
+                successfulChange = true;
+                logger.info("Timer updated:");
+                logger.info(t.getInfo());
+            } catch (Exception e) {
+                logger.error(e);
+            }
+
+        } while (!successfulChange);
     }
 
     private static void computeReset() {
@@ -225,6 +282,7 @@ public class Client {
                 }
             }
         } while (!validId);
+
         return t;
     }
 

@@ -37,6 +37,24 @@ public class TimerServiceImpl implements TimerService {
     }
 
     @Override
+    public void changeTimerInterval(Timer t, int interval) {
+        if (interval < MIN_INTERVAL) {
+            throw new IllegalArgumentException(String.format("Illegal argument for interval: Interval must be greater or equals to %sms", MIN_INTERVAL));
+        }
+
+        t.changeInterval(interval);
+    }
+
+    @Override
+    public void changeTimerIterations(Timer t, int iterations) {
+        if (iterations < MIN_ITERATIONS) {
+            throw new IllegalArgumentException(String.format("Illegal argument for iterations: Iterations must be greater %s", MIN_ITERATIONS - 1));
+        }
+
+        t.changeIterations(iterations);
+    }
+
+    @Override
     public List<Timer> getAllTimers() {
         return timers;
     }

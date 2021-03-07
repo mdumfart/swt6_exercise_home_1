@@ -104,7 +104,7 @@ public class TimerImpl implements Timer {
 
             logger.info(String.format("+++ Timer [%s] started +++", id));
 
-            while(isActive && elapsedIterations != iterations) {
+            while(isActive && elapsedIterations < iterations) {
                 try {
                     Thread.sleep(interval);
 
