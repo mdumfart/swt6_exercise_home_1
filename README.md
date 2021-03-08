@@ -12,4 +12,4 @@ Thread safety should be given. Atomic data types and CopyOnWriteArrayLists are u
 
 ## Compile into single jar
 To compoile the two modules timer and timer-client into a single jar mvn install is used.
-The .jar can be executed with java -jar fileName.jar
+The .jar can be executed with ``java -jar fileName.jar``
