@@ -1,0 +1,2 @@
+$modulePath="./timer/target/timer-1.0.jar;./timer-client/target/timer-client-1.0.jar;$env:USERPROFILE/.m2/repository/org/apache/logging/log4j/log4j-api/2.14.0/log4j-api-2.14.0.jar;$env:USERPROFILE/.m2/repository/org/apache/logging/log4j/log4j-core/2.14.0/log4j-core-2.14.0.jar;$env:USERPROFILE/.m2/repository/org/apache/logging/log4j/log4j-slf4j-impl/2.14.0/log4j-slf4j-impl-2.14.0.jar"
+& "$Env:JAVA_HOME/bin/java" --module-path $modulePath --module "timer.client/swt6.client.Client"
