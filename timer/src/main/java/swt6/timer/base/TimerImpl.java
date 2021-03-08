@@ -10,75 +10,77 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TimerImpl implements Timer {
     private static Logger logger = LogManager.getLogger(TimerImpl.class);
     private List<TimerListener> timerListeners = new CopyOnWriteArrayList<>();
 
     private final int id;
-    private boolean isActive = false;
-    private int interval;
-    private int iterations;
-    private int elapsedIterations = 0;
+    private AtomicBoolean isActive = new AtomicBoolean(false);
+    private AtomicInteger interval = new AtomicInteger();
+    private AtomicInteger iterations = new AtomicInteger();
+    private AtomicInteger elapsedIterations = new AtomicInteger(0);
     private LocalDateTime startedAt;
 
     public TimerImpl(int id, int interval, int iterations) {
         this.id = id;
-        this.interval = interval;
-        this.iterations = iterations;
+        this.interval.set(interval);
+        this.iterations.set(iterations);
     }
 
     public void setInterval(int ms) {
-        interval = ms;
+        interval.set(ms);
     }
 
     public int getInterval() {
-        return interval;
+        return interval.get();
     }
 
     public void setIterations(int iterations) {
-        this.iterations = iterations;
+        this.iterations.set(iterations);
     }
 
     public int getIterations() {
-        return iterations;
+        return iterations.get();
     }
 
     @Override
     public void start() {
-        if (isActive) throw new IllegalArgumentException(String.format("Timer with Id [%s] is already running", id));
+        if (isActive.get()) throw new IllegalArgumentException(String.format("Timer with Id [%s] is already running", id));
 
-        isActive = true;
+        isActive.set(true);
         startedAt = LocalDateTime.now();
         run();
     }
 
     @Override
     public void stop() {
-        if (!isActive) throw new IllegalArgumentException(String.format("Timer with Id [%s] is not running", id));
+        if (!isActive.get()) throw new IllegalArgumentException(String.format("Timer with Id [%s] is not running", id));
 
-        isActive = false;
+        isActive.set(false);
     }
 
     @Override
     public void reset() {
-        elapsedIterations = 0;
+        elapsedIterations.set(0);
         logger.info(String.format("Timer [%s] reset", id));
     }
 
     @Override
     public void changeInterval(int interval) {
-        this.interval = interval;
+        this.interval.set(interval);
     }
 
     @Override
     public void changeIterations(int iterations) {
-        this.iterations = iterations;
+        this.iterations.set(iterations);
     }
 
     @Override
     public boolean isActive() {
-        return isActive;
+        return isActive.get();
     }
 
     @Override
@@ -104,11 +106,11 @@ public class TimerImpl implements Timer {
 
             logger.info(String.format("+++ Timer [%s] started +++", id));
 
-            while(isActive && elapsedIterations < iterations) {
+            while(isActive.get() && elapsedIterations.get() < iterations.get()) {
                 try {
-                    Thread.sleep(interval);
+                    Thread.sleep(interval.get());
 
-                    if (isActive && elapsedIterations < iterations){
+                    if (isActive.get() && elapsedIterations.get() < iterations.get()){
                         fireTickEvent();
                     }
                     else {
@@ -116,14 +118,14 @@ public class TimerImpl implements Timer {
                         manualStop = true;
                     }
                 } catch (InterruptedException e) {
-                    isActive = false;
+                    isActive.equals(false);
                     logger.error("Timer unexpectedly interrupted: Timer stopped");
                 }
             }
 
             if (!manualStop) fireElapsedEvent();
-            elapsedIterations = 0;
-            isActive = false;
+            elapsedIterations.set(0);
+            isActive.set(false);
         });
         thread.start();
     }
@@ -133,7 +135,7 @@ public class TimerImpl implements Timer {
     private void fireTickEvent() {
         Duration elapsedTime = Duration.between(startedAt, LocalDateTime.now());
 
-        TimerEvent event = new TimerEvent(this, id, elapsedTime, ++elapsedIterations, iterations);
+        TimerEvent event = new TimerEvent(this, id, elapsedTime, elapsedIterations.incrementAndGet(), iterations.get());
 
         for (TimerListener listener : timerListeners) {
             listener.timerTicked(event);
@@ -143,7 +145,7 @@ public class TimerImpl implements Timer {
     private void fireElapsedEvent() {
         Duration elapsedTime = Duration.between(startedAt, LocalDateTime.now());
 
-        TimerEvent event = new TimerEvent(this, id, elapsedTime, ++elapsedIterations, iterations);
+        TimerEvent event = new TimerEvent(this, id, elapsedTime, elapsedIterations.incrementAndGet(), iterations.get());
 
         for (TimerListener listener : timerListeners) {
             listener.timerElapsed(event);
